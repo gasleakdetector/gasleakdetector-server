@@ -219,7 +219,7 @@ Copy `.env` to `.env.local` for local development.
 
 > Vercel is the recommended deployment target. The project deploys as serverless functions with zero configuration.
 
-### Option 1: Deploy button
+### Option 1: Deploy
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fgasleakdetector%2Fgasleakdetector-server)
 
