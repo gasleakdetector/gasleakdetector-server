@@ -24,7 +24,10 @@ create table if not exists public.gas_logs_raw (
 create index if not exists idx_raw_device_time on public.gas_logs_raw (device_id, created_at desc);
 create index if not exists idx_raw_created     on public.gas_logs_raw (created_at desc);
 
-alter publication supabase_realtime add table public.gas_logs_raw;
+do $$ begin
+  alter publication supabase_realtime add table public.gas_logs_raw;
+exception when duplicate_object then null;
+end $$;
 
 create table if not exists public.gas_logs_minute (
   id           bigserial    primary key,
@@ -122,6 +125,11 @@ alter table public.gas_logs_raw    enable row level security;
 alter table public.gas_logs_minute enable row level security;
 alter table public.gas_logs_hour   enable row level security;
 alter table public.devices         enable row level security;
+
+drop policy if exists "anon read raw"     on public.gas_logs_raw;
+drop policy if exists "anon read minute"  on public.gas_logs_minute;
+drop policy if exists "anon read hour"    on public.gas_logs_hour;
+drop policy if exists "anon read devices" on public.devices;
 
 create policy "anon read raw"     on public.gas_logs_raw    for select using (true);
 create policy "anon read minute"  on public.gas_logs_minute for select using (true);
