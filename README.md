@@ -29,6 +29,9 @@
 
 ---
 
+> [!NOTE]
+> No pre-built binaries or hosted instances are provided. You are responsible for building and deploying this project yourself.
+
 ## Quick Setup
 
 1. [Deploy to Vercel](#deploy-to-vercel)
