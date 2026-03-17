@@ -108,23 +108,15 @@ returns void language sql security definer as $$
         sample_count = excluded.sample_count;
 $$;
 
--- Keeps raw table lean; historical queries use minute/hour summaries beyond 7d.
-create or replace function public.cleanup_gas_raw()
-returns void language sql security definer as $$
-  delete from public.gas_logs_raw where created_at < now() - interval '7 days';
-$$;
-
 -- pg_cron: runs inside Supabase, no Vercel invocations needed
 create extension if not exists pg_cron;
 
 -- Safe re-run: drop existing jobs before re-scheduling
 select cron.unschedule('aggregate-gas-minute') where exists (select 1 from cron.job where jobname = 'aggregate-gas-minute');
 select cron.unschedule('aggregate-gas-hour')   where exists (select 1 from cron.job where jobname = 'aggregate-gas-hour');
-select cron.unschedule('cleanup-gas-raw')      where exists (select 1 from cron.job where jobname = 'cleanup-gas-raw');
 
 select cron.schedule('aggregate-gas-minute', '* * * * *',   $$ select public.aggregate_gas_minute(); $$);
 select cron.schedule('aggregate-gas-hour',   '1 * * * *',   $$ select public.aggregate_gas_hour(); $$);
-select cron.schedule('cleanup-gas-raw',      '0 3 * * *',   $$ select public.cleanup_gas_raw(); $$);
 
 alter table public.gas_logs_raw    enable row level security;
 alter table public.gas_logs_minute enable row level security;
