@@ -294,6 +294,7 @@ vercel dev
 ```
 
 The API is available at `http://localhost:3000`.
+---
 
 ## Contributing
 
@@ -307,3 +308,11 @@ Don't forget to give the project a star! Thanks again!
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
+
+---
+
+## Closing
+
+If you have any questions or run into any issues, feel free to reach out at [pan2512811@gmail.com](mailto:pan2512811@gmail.com).
+
+If you find this project useful, consider giving it a ⭐ — it means a lot and helps others discover the project. Thanks!
