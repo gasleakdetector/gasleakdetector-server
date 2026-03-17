@@ -294,6 +294,7 @@ vercel dev
 ```
 
 The API is available at `http://localhost:3000`.
+
 ---
 
 ## Contributing
@@ -313,6 +314,7 @@ Don't forget to give the project a star! Thanks again!
 
 ## Closing
 
-If you have any questions or run into any issues, feel free to reach out at [pan2512811@gmail.com](mailto:pan2512811@gmail.com).
-
-If you find this project useful, consider giving it a ⭐ — it means a lot and helps others discover the project. Thanks!
+<p align="center">
+  Have questions or ran into issues? Reach out at <a href="mailto:pan2512811@gmail.com">pan2512811@gmail.com</a>.<br/>
+  Found this project useful? Consider giving it a ⭐ — it means a lot and helps others discover it. Thanks!
+</p>
