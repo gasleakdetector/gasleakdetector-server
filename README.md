@@ -191,9 +191,20 @@ Run `supabase/schema.sql` once in the Supabase SQL Editor. It creates:
 - `gas_logs_minute` — per-minute aggregates
 - `gas_logs_hour` — per-hour aggregates
 - `aggregate_gas_minute()` and `aggregate_gas_hour()` — aggregation functions
-- `cleanup_gas_raw()` — deletes raw rows older than 7 days
-- `pg_cron` jobs for all three functions
+- `pg_cron` jobs for both aggregation functions
 - Row Level Security policies (anon read-only)
+
+### Retention Policy
+
+Raw rows in `gas_logs_raw` are **never deleted automatically**. Data is preserved based on status:
+
+| Status    | Retention         |
+|-----------|-------------------|
+| `normal`  | Manual cleanup only — no automatic deletion |
+| `warning` | Kept permanently  |
+| `danger`  | Kept permanently  |
+
+> Historical queries beyond recent data should use the `gas_logs_minute` and `gas_logs_hour` aggregate tables for performance.
 
 ---
 
@@ -219,7 +230,7 @@ Copy `.env` to `.env.local` for local development.
 
 > Vercel is the recommended deployment target. The project deploys as serverless functions with zero configuration.
 
-### Option 1: Deploy
+### Option 1: Deploy button
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fgasleakdetector%2Fgasleakdetector-server)
 
