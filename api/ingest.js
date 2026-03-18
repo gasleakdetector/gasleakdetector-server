@@ -24,7 +24,8 @@ export default async function handler(req, res) {
         const v = validateLogData(item);
         if (!v.valid) continue;
         const status = determineStatus(v.ppm);
-        const log = await saveLog({ deviceId: item.device_id, ppm: v.ppm, status, ip });
+        const log = await saveLog({ deviceId: item.device_id, ppm: v.ppm, status, ip,
+          name: item.name, lat: item.lat, lng: item.lng });
         results.push({ id: log.id, status });
 
         if (await shouldSendAlert(item.device_id, status)) {
@@ -37,9 +38,9 @@ export default async function handler(req, res) {
     const v = validateLogData(req.body);
     if (!v.valid) return res.status(400).json({ error: v.error });
 
-    const { device_id } = req.body;
+    const { device_id, name, lat, lng } = req.body;
     const status = determineStatus(v.ppm);
-    const log = await saveLog({ deviceId: device_id, ppm: v.ppm, status, ip });
+    const log = await saveLog({ deviceId: device_id, ppm: v.ppm, status, ip, name, lat, lng });
 
     if (await shouldSendAlert(device_id, status)) {
       await sendAlert({ deviceId: device_id, ppm: v.ppm, timestamp: log.created_at }).catch(() => {});
