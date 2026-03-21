@@ -114,12 +114,32 @@ $$;
 -- pg_cron: runs inside Supabase, no Vercel invocations needed
 create extension if not exists pg_cron;
 
+-- Deletes 'normal' rows from gas_logs_raw that are older than 48 hours.
+-- 'warning' and 'danger' rows are kept indefinitely for audit purposes.
+-- Safe to run repeatedly; returns the number of rows deleted.
+create or replace function public.purge_normal_logs()
+returns integer language plpgsql security definer as $$
+declare
+  deleted_count integer;
+begin
+  delete from public.gas_logs_raw
+  where status     = 'normal'
+    and created_at < now() - interval '48 hours';
+
+  get diagnostics deleted_count = row_count;
+  return deleted_count;
+end;
+$$;
+
 -- Safe re-run: drop existing jobs before re-scheduling
 select cron.unschedule('aggregate-gas-minute') where exists (select 1 from cron.job where jobname = 'aggregate-gas-minute');
 select cron.unschedule('aggregate-gas-hour')   where exists (select 1 from cron.job where jobname = 'aggregate-gas-hour');
+select cron.unschedule('purge-normal-logs')    where exists (select 1 from cron.job where jobname = 'purge-normal-logs');
 
 select cron.schedule('aggregate-gas-minute', '* * * * *',   $$ select public.aggregate_gas_minute(); $$);
 select cron.schedule('aggregate-gas-hour',   '1 * * * *',   $$ select public.aggregate_gas_hour(); $$);
+-- Runs daily at 03:00 UTC
+select cron.schedule('purge-normal-logs',    '0 3 * * *',   $$ select public.purge_normal_logs(); $$);
 
 alter table public.gas_logs_raw    enable row level security;
 alter table public.gas_logs_minute enable row level security;
