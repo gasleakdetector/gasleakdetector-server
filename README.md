@@ -3,34 +3,34 @@
 </p>
 
 <p align="center">
-  <img alt="License" src="https://img.shields.io/github/license/gasleakdetector/gasleakdetector-server?color=04A8F4&style=flat-square"/>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.0-04A8F4?style=flat-square"/>
-  <img alt="Build" src="https://img.shields.io/github/actions/workflow/status/gasleakdetector/gasleakdetector-server/ci.yml?style=flat-square&color=04A8F4"/>
-  <img alt="Last commit" src="https://img.shields.io/github/last-commit/gasleakdetector/gasleakdetector-server?color=04A8F4&style=flat-square"/>
+  <h3 align="center">Gas Leak Detector — Server</h3>
 </p>
 
-<div align="center">    
-  <h1>Gas Leak Detector — Server</h1>
-	
-  <p>
-    Backend API for the Gas Leak Detector system.<br/>
-    Handles ESP8266 sensor ingestion, persists data to Supabase,<br/>
-    and streams real-time updates to the Android app via WebSocket.
-  </p>
+<p align="center">
+  This is the backend API server for the Gas Leak Detector system.<br/>
+  Receives sensor data from ESP8266, persists it to Supabase,<br/>
+  and streams real-time readings to the Android app via WebSocket.
+</p>
 
-  <p>
-    Part of the <b>Gas Leak Detector</b> ecosystem:
-    <br/>
-    <a href="https://github.com/gasleakdetector/gasleakdetector-server">Server</a> •
-    <a href="https://github.com/gasleakdetector/gasleakdetector-esp">ESP8266 Firmware</a> •
-    <a href="https://github.com/gasleakdetector/gasleakdetector">Android App</a>
-  </p>
-</div>
+<p align="center">
+  <a href="https://github.com/gasleakdetector/gasleakdetector-server/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/gasleakdetector/gasleakdetector-server/build.yml?style=for-the-badge" alt="Build status"/>
+  </a>
+  <a href="https://github.com/gasleakdetector/gasleakdetector-server/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/gasleakdetector/gasleakdetector-server?style=for-the-badge" alt="License"/>
+  </a>
+</p>
 
 ---
 
-> ⚠️ This repository contains the server component only.  
-> No hosted instance or pre-built binaries are provided — deployment is your responsibility.
+> **Part of [gasleakdetector-app](https://github.com/gasleakdetector/gasleakdetector) and [gasleakdetector-esp](https://github.com/gasleakdetector/gasleakdetector-esp)**
+> — the main repository containing the full project including the ESP8266 firmware and Android app.
+> This repository is the server-only branch of that project.
+
+---
+
+> [!NOTE]
+> No pre-built binaries or hosted instances are provided. You are responsible for building and deploying this project yourself.
 
 ## Quick Setup
 
@@ -48,6 +48,7 @@ api/
   ingest.js          POST  — primary ESP8266 data ingestion endpoint
   logs.js            GET   — recent logs with pagination
   realtime-config.js GET   — Supabase credentials for Android WebSocket
+  stats.js           GET   — hourly aggregated statistics per device
   status.js          GET   — latest reading for a device
 lib/
   email.js           Resend email alert helper
@@ -168,6 +169,37 @@ Returns the most recent reading for a specific device. Useful for a quick health
   "created_at": "2026-03-15T10:00:00+00:00"
 }
 ```
+
+---
+
+### GET /api/stats
+
+Returns hourly aggregated statistics from `gas_logs_hour`. This is the endpoint the Android statistics chart reads from — it never touches raw data, so queries stay fast regardless of data volume.
+
+**Query parameters:**
+
+| Parameter   | Required | Default | Description                                   |
+|-------------|----------|---------|-----------------------------------------------|
+| `device_id` | No       | —       | Filter by device. Omit to return all devices. |
+| `limit`     | No       | `10`    | Number of hourly buckets to return (max 50)   |
+
+**Response:**
+
+```json
+{
+  "data": [
+    {
+      "bucket": "2026-03-21T10:00:00+00:00",
+      "avg_gas": 213.45,
+      "min_gas": 180.0,
+      "max_gas": 310.0,
+      "sample_count": 1800
+    }
+  ]
+}
+```
+
+Results are ordered by `bucket` descending — most recent hour first. Each bucket represents one full hour of aggregated readings from that device.
 
 ---
 
@@ -312,16 +344,9 @@ Don't forget to give the project a star! Thanks again!
 
 ---
 
-## License
-
-Apache 2.0 © [Gas Leak Detector](LICENSE)
-
----
-
 ## Closing
 
 <p align="center">
   Have questions or ran into issues? Reach out at <a href="mailto:pan2512811@gmail.com">pan2512811@gmail.com</a>.<br/>
   Found this project useful? Consider giving it a ⭐ — it means a lot and helps others discover it. Thanks!
 </p>
-
