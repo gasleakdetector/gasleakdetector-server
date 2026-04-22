@@ -4,7 +4,8 @@
 create table if not exists public.devices (
   id         text primary key,
   name       text,
-  location   text,
+  lat        double precision,
+  lng        double precision,
   created_at timestamptz default now()
 );
 
@@ -77,7 +78,7 @@ returns void language sql security definer as $$
       else 'normal'
     end
   from public.gas_logs_raw
-  where created_at >= now() - interval '2 minutes'
+  where created_at >= now() - interval '10 minutes'
     and created_at <  date_trunc('minute', now())
   group by device_id, date_trunc('minute', created_at)
   on conflict (device_id, bucket) do update
@@ -101,7 +102,7 @@ returns void language sql security definer as $$
     max(max_gas),
     sum(sample_count)::integer
   from public.gas_logs_minute
-  where bucket >= now() - interval '2 hours'
+  where bucket >= now() - interval '4 hours'
     and bucket <  date_trunc('hour', now())
   group by device_id, date_trunc('hour', bucket)
   on conflict (device_id, bucket) do update
