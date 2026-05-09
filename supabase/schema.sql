@@ -156,3 +156,23 @@ create policy "anon read raw"     on public.gas_logs_raw    for select using (tr
 create policy "anon read minute"  on public.gas_logs_minute for select using (true);
 create policy "anon read hour"    on public.gas_logs_hour   for select using (true);
 create policy "anon read devices" on public.devices         for select using (true);
+
+-- FCM push notification tokens registered by the Android app.
+-- One row per (device_id, token) pair; token rotations are handled via upsert.
+create table if not exists public.fcm_tokens (
+  id             bigserial    primary key,
+  device_id      text         not null,
+  token          text         not null,
+  last_alerted_at timestamptz,
+  updated_at     timestamptz  not null default now(),
+
+  constraint fcm_tokens_unique unique (device_id, token)
+);
+
+create index if not exists idx_fcm_device on public.fcm_tokens (device_id);
+
+alter table public.fcm_tokens enable row level security;
+
+-- Tokens are write-only from the public side; reads use the service key on the server.
+drop policy if exists "deny anon read fcm_tokens" on public.fcm_tokens;
+create policy "deny anon read fcm_tokens" on public.fcm_tokens for select using (false);
