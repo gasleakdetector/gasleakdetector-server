@@ -250,7 +250,7 @@ Raw rows in `gas_logs_raw` are **never deleted automatically**. Data is preserve
 | `SUPABASE_ANON_KEY`     | Required      | Supabase anonymous key (used by Android WebSocket)         |
 | `SUPABASE_SERVICE_KEY`  | Required      | Supabase service role key (used by all server-side writes) |
 | `VALID_API_KEY`         | Required      | Shared secret sent in `x-api-key` header by ESP and app   |
-| `RESEND_API_KEY`        | Required      | Resend API key for email alerts                            |
+| `RESEND_API_KEY`        | Optional      | Resend API key for email alerts                            |
 | `ALERT_EMAIL`           | Required      | Recipient address for danger-level alerts                  |
 | `DANGER_THRESHOLD`      | Required      | PPM value at or above which status becomes `danger` (Recommended: 800 for MQ-6)       |
 | `WARNING_THRESHOLD`     | Required      | PPM value at or above which status becomes `warning` (Recommended: 300 for MQ-6)      |
