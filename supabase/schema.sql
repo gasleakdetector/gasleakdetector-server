@@ -10,7 +10,7 @@ create table if not exists public.devices (
 );
 
 -- ESP writes raw sensor readings here; realtime subscription reads from this table
-create table if not exists public.gas_logs_raw (
+create table if not exists public.gas_logs_raws (
   id         bigserial    primary key,
   device_id  text         not null,
   gas_ppm    double precision not null,
@@ -18,15 +18,15 @@ create table if not exists public.gas_logs_raw (
   ip_address text,
   created_at timestamptz  not null default now(),
 
-  constraint gas_logs_raw_status_check
+  constraint gas_logs_raws_status_check
     check (status in ('normal', 'warning', 'danger'))
 );
 
-create index if not exists idx_raw_device_time on public.gas_logs_raw (device_id, created_at desc);
-create index if not exists idx_raw_created     on public.gas_logs_raw (created_at desc);
+create index if not exists idx_raw_device_time on public.gas_logs_raws (device_id, created_at desc);
+create index if not exists idx_raw_created     on public.gas_logs_raws (created_at desc);
 
 do $$ begin
-  alter publication supabase_realtime add table public.gas_logs_raw;
+  alter publication supabase_realtime add table public.gas_logs_raws;
 exception when duplicate_object then null;
 end $$;
 
@@ -77,7 +77,7 @@ returns void language sql security definer as $$
       when max(case status when 'warning' then 1 else 0 end) = 1 then 'warning'
       else 'normal'
     end
-  from public.gas_logs_raw
+  from public.gas_logs_raws
   where created_at >= now() - interval '10 minutes'
     and created_at <  date_trunc('minute', now())
   group by device_id, date_trunc('minute', created_at)
@@ -115,7 +115,7 @@ $$;
 -- pg_cron: runs inside Supabase, no Vercel invocations needed
 create extension if not exists pg_cron;
 
--- Deletes 'normal' rows from gas_logs_raw that are older than 48 hours.
+-- Deletes 'normal' rows from gas_logs_raws that are older than 48 hours.
 -- 'warning' and 'danger' rows are kept indefinitely for audit purposes.
 -- Safe to run repeatedly; returns the number of rows deleted.
 create or replace function public.purge_normal_logs()
@@ -123,7 +123,7 @@ returns integer language plpgsql security definer as $$
 declare
   deleted_count integer;
 begin
-  delete from public.gas_logs_raw
+  delete from public.gas_logs_raws
   where status     = 'normal'
     and created_at < now() - interval '48 hours';
 
@@ -142,17 +142,17 @@ select cron.schedule('aggregate-gas-hour',   '1 * * * *',   $$ select public.agg
 -- Runs daily at 03:00 UTC
 select cron.schedule('purge-normal-logs',    '0 3 * * *',   $$ select public.purge_normal_logs(); $$);
 
-alter table public.gas_logs_raw    enable row level security;
+alter table public.gas_logs_raws    enable row level security;
 alter table public.gas_logs_minute enable row level security;
 alter table public.gas_logs_hour   enable row level security;
 alter table public.devices         enable row level security;
 
-drop policy if exists "anon read raw"     on public.gas_logs_raw;
+drop policy if exists "anon read raw"     on public.gas_logs_raws;
 drop policy if exists "anon read minute"  on public.gas_logs_minute;
 drop policy if exists "anon read hour"    on public.gas_logs_hour;
 drop policy if exists "anon read devices" on public.devices;
 
-create policy "anon read raw"     on public.gas_logs_raw    for select using (true);
+create policy "anon read raw"     on public.gas_logs_raws    for select using (true);
 create policy "anon read minute"  on public.gas_logs_minute for select using (true);
 create policy "anon read hour"    on public.gas_logs_hour   for select using (true);
 create policy "anon read devices" on public.devices         for select using (true);
