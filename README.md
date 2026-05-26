@@ -9,7 +9,7 @@
 </p>
 
 <div align="center">    
-  <h1>Gas Leak Detector — Server</h1>
+  <h1>Gas Leak Detector - Server</h1>
 	
   <p>
     Backend API for the Gas Leak Detector system.<br/>
@@ -29,7 +29,7 @@
 ---
 
 > ⚠️ This repository contains the server component only.  
-> No hosted instance or pre-built binaries are provided — deployment is your responsibility.
+> No hosted instance or pre-built binaries are provided - deployment is your responsibility.
 
 ## Quick Setup
 
@@ -43,18 +43,18 @@
 
 ```
 api/
-  historical.js      GET   — paginated historical sensor data
-  ingest.js          POST  — primary ESP8266 data ingestion endpoint
-  logs.js            GET   — recent logs with pagination
-  realtime-config.js GET   — Supabase credentials for Android WebSocket
-  stats.js           GET   — hourly aggregated statistics per device
-  status.js          GET   — latest reading for a device
+  historical.js      GET   - paginated historical sensor data
+  ingest.js          POST  - primary ESP8266 data ingestion endpoint
+  logs.js            GET   - recent logs with pagination
+  realtime-config.js GET   - Supabase credentials for Android WebSocket
+  stats.js           GET   - hourly aggregated statistics per device
+  status.js          GET   - latest reading for a device
 lib/
   email.js           Resend email alert helper
   supabase.js        Supabase client, queries, and realtime subscriptions
   validator.js       API key validation, PPM status calculation, input validation
 supabase/
-  schema.sql         Full database schema — run once in Supabase SQL Editor
+  schema.sql         Full database schema - run once in Supabase SQL Editor
 ```
 
 ---
@@ -106,9 +106,9 @@ Returns raw sensor readings for a time range with cursor-based pagination. The A
 
 | Parameter   | Required | Default | Description                                   |
 |-------------|----------|---------|-----------------------------------------------|
-| `device_id` | No       | —       | Filter by device. Omit to return all devices. |
+| `device_id` | No       | -       | Filter by device. Omit to return all devices. |
 | `range`     | No       | `1d`    | Time window: `1h`, `6h`, `1d`, `7d`, `30d`   |
-| `cursor`    | No       | —       | Last seen row `id` for pagination             |
+| `cursor`    | No       | -       | Last seen row `id` for pagination             |
 
 **Response:**
 
@@ -134,9 +134,9 @@ Returns recent readings with descending order and cursor pagination. Intended fo
 
 | Parameter   | Required | Default | Description                        |
 |-------------|----------|---------|------------------------------------|
-| `device_id` | No       | —       | Filter by device                   |
+| `device_id` | No       | -       | Filter by device                   |
 | `limit`     | No       | `100`   | Rows per page (max 500)            |
-| `cursor`    | No       | —       | Last seen row `id` for pagination  |
+| `cursor`    | No       | -       | Last seen row `id` for pagination  |
 
 **Response:**
 
@@ -173,13 +173,13 @@ Returns the most recent reading for a specific device. Useful for a quick health
 
 ### GET /api/stats
 
-Returns hourly aggregated statistics from `gas_logs_hour`. This is the endpoint the Android statistics chart reads from — it never touches raw data, so queries stay fast regardless of data volume.
+Returns hourly aggregated statistics from `gas_logs_hour`. This is the endpoint the Android statistics chart reads from - it never touches raw data, so queries stay fast regardless of data volume.
 
 **Query parameters:**
 
 | Parameter   | Required | Default | Description                                   |
 |-------------|----------|---------|-----------------------------------------------|
-| `device_id` | No       | —       | Filter by device. Omit to return all devices. |
+| `device_id` | No       | -       | Filter by device. Omit to return all devices. |
 | `limit`     | No       | `10`    | Number of hourly buckets to return (max 50)   |
 
 **Response:**
@@ -198,7 +198,7 @@ Returns hourly aggregated statistics from `gas_logs_hour`. This is the endpoint 
 }
 ```
 
-Results are ordered by `bucket` descending — most recent hour first.
+Results are ordered by `bucket` descending - most recent hour first.
 
 ---
 
@@ -220,11 +220,11 @@ The Android app calls this endpoint once at startup, builds the WebSocket URL us
 
 Run `supabase/schema.sql` once in the Supabase SQL Editor. It creates:
 
-- `devices` — registered device registry
-- `gas_logs_raw` — raw readings from ESP, realtime-enabled
-- `gas_logs_minute` — per-minute aggregates
-- `gas_logs_hour` — per-hour aggregates
-- `aggregate_gas_minute()` and `aggregate_gas_hour()` — aggregation functions
+- `devices` - registered device registry
+- `gas_logs_raw` - raw readings from ESP, realtime-enabled
+- `gas_logs_minute` - per-minute aggregates
+- `gas_logs_hour` - per-hour aggregates
+- `aggregate_gas_minute()` and `aggregate_gas_hour()` - aggregation functions
 - `pg_cron` jobs for both aggregation functions
 - Row Level Security policies (anon read-only)
 
@@ -234,7 +234,7 @@ Raw rows in `gas_logs_raw` are **never deleted automatically**. Data is preserve
 
 | Status    | Retention         |
 |-----------|-------------------|
-| `normal`  | Manual cleanup only — no automatic deletion |
+| `normal`  | Manual cleanup only - no automatic deletion |
 | `warning` | Kept permanently  |
 | `danger`  | Kept permanently  |
 
@@ -353,6 +353,6 @@ Apache 2.0 © [Gas Leak Detector](LICENSE)
 
 <p align="center">
   Have questions or ran into issues? Reach out at <a href="mailto:pan2512811@gmail.com">pan2512811@gmail.com</a>.<br/>
-  Found this project useful? Consider giving it a ⭐ — it means a lot and helps others discover it. Thanks!
+  Found this project useful? Consider giving it a ⭐ - it means a lot and helps others discover it. Thanks!
 </p>
 
