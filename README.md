@@ -218,7 +218,7 @@ The Android app calls this endpoint once at startup, builds the WebSocket URL us
 
 ## Supabase Schema
 
-Run `supabase/schema.sql` once in the Supabase SQL Editor. It creates:
+Run [supabase/schema.sql](supabase/schema.sql) once in the Supabase SQL Editor. It creates:
 
 - `devices` - registered device registry
 - `gas_logs_raw` - raw readings from ESP, realtime-enabled
