@@ -58,7 +58,7 @@ create table if not exists public.gas_logs_hour (
 
 create index if not exists idx_hour_device_bucket on public.gas_logs_hour (device_id, bucket desc);
 
--- Aggregates last 2 minutes of raw rows into per-minute buckets.
+-- Aggregates the last 10 minutes of raw rows into per-minute buckets.
 -- Status uses worst-case: any danger row in the bucket → bucket is danger.
 create or replace function public.aggregate_gas_minute()
 returns void language sql security definer as $$
@@ -77,7 +77,7 @@ returns void language sql security definer as $$
       else 'normal'
     end
   from public.gas_logs_raw
-  where created_at >= now() - interval '2 minutes'
+  where created_at >= now() - interval '10 minutes'
     and created_at <  date_trunc('minute', now())
   group by device_id, date_trunc('minute', created_at)
   on conflict (device_id, bucket) do update
@@ -88,7 +88,7 @@ returns void language sql security definer as $$
         status       = excluded.status;
 $$;
 
--- Aggregates last 2 hours of minute rows into per-hour buckets.
+-- Aggregates the last 4 hours of minute rows into per-hour buckets.
 create or replace function public.aggregate_gas_hour()
 returns void language sql security definer as $$
   insert into public.gas_logs_hour
@@ -101,7 +101,7 @@ returns void language sql security definer as $$
     max(max_gas),
     sum(sample_count)::integer
   from public.gas_logs_minute
-  where bucket >= now() - interval '2 hours'
+  where bucket >= now() - interval '4 hours'
     and bucket <  date_trunc('hour', now())
   group by device_id, date_trunc('hour', bucket)
   on conflict (device_id, bucket) do update
