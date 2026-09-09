@@ -16,3 +16,4 @@ jobs:
           node-version: 20
       - run: npm install
       - run: node --check api/ingest.js api/historical.js api/logs.js api/status.js api/realtime-config.js lib/supabase.js lib/email.js lib/validator.js
+      - run: npm test
