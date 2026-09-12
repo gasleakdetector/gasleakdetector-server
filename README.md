@@ -204,7 +204,7 @@ Results are ordered by `bucket` descending - most recent hour first.
 
 ### GET /api/realtime-config
 
-Provides the Supabase URL and anonymous key required for the Android app to establish a direct WebSocket connection to Supabase Realtime. The primary purpose is to allow the Android client to dynamically obtain credentials for subscribing to real-time INSERT events on the gas_logs_raw table, eliminating the need to hardcode sensitive information in the APK.
+Provides the Supabase URL and anonymous key used to connect to Supabase Realtime. The anonymous key is intentionally public: it identifies the Supabase project but is not an authentication credential and must never be treated as a secret.
 
 Response:
 
@@ -212,7 +212,9 @@ Response:
 { "url": "https://xxx.supabase.co", "anonKey": "eyJ..." }
 ```
 
-The Android app calls this endpoint once at startup, builds the WebSocket URL using the returned credentials, and subscribes to INSERT events on gas_logs_raw to receive live sensor readings.
+The Android app must use a device-scoped custom JWT when subscribing to `gas_logs_raw`. The JWT must contain a `device_id` claim matching the device, because the anonymous key alone cannot read realtime rows under the RLS policy. Anyone who extracts the anonymous key can identify the project and attempt requests, but cannot read sensor data without a valid device-scoped token.
+
+The server-side API endpoints continue to use the service key and remain the supported path for historical and current readings.
 
 ---
 
@@ -355,4 +357,3 @@ Apache 2.0 © [Gas Leak Detector](LICENSE)
   Have questions or ran into issues? Reach out at <a href="mailto:pan2512811@gmail.com">pan2512811@gmail.com</a>.<br/>
   Found this project useful? Consider giving it a ⭐ - it means a lot and helps others discover it. Thanks!
 </p>
-

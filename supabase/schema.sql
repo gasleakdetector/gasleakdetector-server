@@ -150,8 +150,14 @@ drop policy if exists "anon read raw"     on public.gas_logs_raw;
 drop policy if exists "anon read minute"  on public.gas_logs_minute;
 drop policy if exists "anon read hour"    on public.gas_logs_hour;
 drop policy if exists "anon read devices" on public.devices;
+drop policy if exists "device read raw"     on public.gas_logs_raw;
+drop policy if exists "device read minute"  on public.gas_logs_minute;
+drop policy if exists "device read hour"    on public.gas_logs_hour;
+drop policy if exists "device read devices" on public.devices;
 
-create policy "anon read raw"     on public.gas_logs_raw    for select using (true);
-create policy "anon read minute"  on public.gas_logs_minute for select using (true);
-create policy "anon read hour"    on public.gas_logs_hour   for select using (true);
-create policy "anon read devices" on public.devices         for select using (true);
+-- The custom JWT issued to a device must contain a device_id claim.
+-- Anonymous Supabase keys do not contain this claim and cannot read sensor data.
+create policy "device read raw"     on public.gas_logs_raw    for select using (device_id = (select auth.jwt() ->> 'device_id'));
+create policy "device read minute"  on public.gas_logs_minute for select using (device_id = (select auth.jwt() ->> 'device_id'));
+create policy "device read hour"    on public.gas_logs_hour   for select using (device_id = (select auth.jwt() ->> 'device_id'));
+create policy "device read devices" on public.devices         for select using (id = (select auth.jwt() ->> 'device_id'));
