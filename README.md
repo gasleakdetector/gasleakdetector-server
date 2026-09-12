@@ -257,8 +257,12 @@ Raw rows in `gas_logs_raw` are **never deleted automatically**. Data is preserve
 | `DANGER_THRESHOLD`      | Required      | PPM value at or above which status becomes `danger` (Recommended: 800 for MQ-6)       |
 | `WARNING_THRESHOLD`     | Required      | PPM value at or above which status becomes `warning` (Recommended: 300 for MQ-6)      |
 | `EMAIL_COOLDOWN_MINUTES`| Optional       | Minimum minutes between repeated email alerts (default: 2) |
+| `UPSTASH_REDIS_REST_URL`| Required      | Upstash Redis REST URL used for ingest rate limiting       |
+| `UPSTASH_REDIS_REST_TOKEN`| Required    | Upstash Redis REST token used for ingest rate limiting     |
 
 Copy `.env` to `.env.local` for local development.
+
+`POST /api/ingest` is limited to 60 requests per device per minute. Batch requests count once per distinct device and are rejected before any rows are written if a device exceeds its limit.
 
 ---
 
