@@ -9,6 +9,6 @@
     "@supabase/supabase-js": "^2.116.0",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.4",
-    "resend": "^6.26.0"
+    "resend": "^6.28.1"
   }
 }
