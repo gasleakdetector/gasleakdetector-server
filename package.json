@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0",
-    "@upstash/ratelimit": "^2.2.1",
+    "@upstash/ratelimit": "^2.2.2",
     "@upstash/redis": "^1.41.0",
     "resend": "^6.39.0"
   }
